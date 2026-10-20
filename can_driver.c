@@ -10,11 +10,13 @@
 
 void CAN_init(void){
     MCP_reset();
-    
+    _delay_ms(10);
+
     // baud rate configuration for 38.4 kbps :
     MCP_write(REG_CNF1, 0x0F); 
     MCP_write(REG_CNF2, 0xB1);
     MCP_write(REG_CNF3, 0x05);
+    MCP_write(REG_RXB0CTRL, 0x60);   // pas de filtrage
     
     MCP_write(REG_CANINTE, 0x01);
 
