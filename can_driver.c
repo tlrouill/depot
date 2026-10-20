@@ -1,3 +1,6 @@
+#include "system_definitions.h"   // doit être le 1er include (définit F_CPU)
+#include <util/delay.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -16,6 +19,7 @@ void CAN_init(void){
     MCP_write(REG_CNF1, 0x0F); 
     MCP_write(REG_CNF2, 0xB1);
     MCP_write(REG_CNF3, 0x05);
+    
     MCP_write(REG_RXB0CTRL, 0x60);   // pas de filtrage
     
     MCP_write(REG_CANINTE, 0x01);

@@ -118,16 +118,30 @@ int main(void) {
         io_update_led_from_buttons();
         _delay_ms(150);
     }*/
-    CAN_init();
+        CAN_init();
     init_interruptions();
 
-    CAN_init();                       // avec bit_modify corrigé, mode loopback
+    Can_message msg_tx = { .id = 0x001, .length = 2, .data = {0xAA, 0x55} };
+    Can_message msg_rx = {0};
+
+    // Debug : mode attendu 0x40 (loopback)
+    printf("CANSTAT = %02x\n", MCP_read(REG_CANSTAT));
+
     CAN_send_message(msg_tx);
     _delay_ms(10);
-    if (MCP_read(REG_CANINTF) & 0x01) {      // RX0IF
+
+    printf("CANINTF = %02x  TXB0CTRL = %02x\n",
+           MCP_read(REG_CANINTF), MCP_read(REG_TXB0CTRL));
+
+    if (MCP_read(REG_CANINTF) & 0x01) {        // RX0IF
         CAN_receive_message(&msg_rx);
-        printf("id=%x d0=%x d1=%x\n", msg_rx.id, msg_rx.data[0], msg_rx.data[1]);
+        printf("id=%x len=%d d0=%x d1=%x\n",
+               msg_rx.id, msg_rx.length, msg_rx.data[0], msg_rx.data[1]);
+    } else {
+        printf("rien recu\n");
     }
+
+    while (1) {}     // ne pas quitter main
 
     return 0;
 }
