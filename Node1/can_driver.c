@@ -15,16 +15,16 @@ void CAN_init(void){
     MCP_reset();
     _delay_ms(10);
 
-    // baud rate configuration for 38.4 kbps :
-    MCP_write(REG_CNF1, 0x0F); 
-    MCP_write(REG_CNF2, 0xB1);
-    MCP_write(REG_CNF3, 0x05);
+    // Configuration des registres CNF pour 250 kbps @ 16 MHz
+    MCP_write(REG_CNF1, 0x01); // BRP = 1 (TQ = 2/16MHz = 125ns), SJW = 1
+    MCP_write(REG_CNF2, 0xB1); // PRSEG = 2, PHSEG1 = 6, BTLMODE = 1, SAM = 0
+    MCP_write(REG_CNF3, 0x05); // PHSEG2 = 6, WAKFIL = 0
     
     MCP_write(REG_RXB0CTRL, 0x60);   // pas de filtrage
     
     MCP_write(REG_CANINTE, 0x01);
 
-    MCP_bit_modify(REG_CANCTRL, 0xE0, 0x50);
+    MCP_bit_modify(REG_CANCTRL, 0xE0, 0x00);
 }
 
 void CAN_send_message(Can_message message){

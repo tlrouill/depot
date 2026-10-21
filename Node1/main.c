@@ -125,8 +125,8 @@ int main(void) {
 
     //test day 5 
     
-    /*Can_message msg_tx = { .id = 0x041, .length = 2, .data = {0xAA, 0x55,} };
-    Can_message msg_rx = {0};
+    Can_message msg_tx = { .id = 0x041, .length = 2, .data = {0xAA, 0x55,} };
+    /*Can_message msg_rx = {0};
 
     // Debug : mode attendu 0x40 (loopback)
     printf("CANSTAT = %02x\n", MCP_read(REG_CANSTAT));
@@ -143,11 +143,14 @@ int main(void) {
                msg_rx.id, msg_rx.length, msg_rx.data[0], msg_rx.data[1]);
     } else {
         printf("rien recu\n");
-    }
+    }*/
+
+
 
     while(1){
-
-    }*/
+        CAN_send_message(msg_tx);
+        _delay_ms(500);
+    }
 
     return 0;
 }

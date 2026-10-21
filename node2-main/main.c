@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "sam.h"
+#include "uart.h"
+#include "can.h"
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -20,12 +22,38 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //Uncomment after including uart above
-    //uart_init(/*cpufreq*/, /*baud*/);
-    //printf("Hello World\n\r");
+    uart_init(84000000, 9600);
+    
+    CanInit init = {
+        .phase2 = 1,   // Phase 2 = (1 + 1) = 2 Tq
+        .propag = 1,   // Propag  = (1 + 1) = 2 Tq
+        .phase1 = 2,   // Phase 1 = (2 + 1) = 3 Tq
+        .sjw    = 0,   // SJW     = (0 + 1) = 1 Tq
+        .brp    = 20,  // Prescaler BRP
+        .smp    = 0    // Échantillonnage unique
+    };
 
-    while (1)
-    {
-        /* code */
+    // Appel à la fonction
+    can_init(init, 0);
+
+    printf("Hello World\n\r");
+
+    CanMsg m;
+
+while (1) {
+    if (can_rx(&m)) {
+        // Un message vient d'être reçu !
+        printf("CanMsg(id:%d, length:%d, data:{", m.id, m.length);
+        if (m.length > 0) {
+            printf("%d", m.byte[0]);
+        }
+        for (uint8_t i = 1; i < m.length; i++) {
+            printf(", %d", m.byte[i]);
+        }
+        printf("})\n\r");
     }
+    
+    // Suite du code (ex: contrôle des moteurs, etc.)
+}
     
 }
