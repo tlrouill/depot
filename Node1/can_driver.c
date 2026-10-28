@@ -14,16 +14,20 @@
 void CAN_init(void){
     MCP_reset();
     _delay_ms(10);
+    uint8_t stat = MCP_read(REG_CANSTAT);
+    // Après un Reset matériel ou logiciel, CANSTAT doit valoir 0x80 (Mode Configuration)
+    printf("Test CANSTAT au démarrage : 0x%02X\n", stat);
 
     // Configuration des registres CNF pour 250 kbps @ 16 MHz
-    MCP_write(REG_CNF1, 0x01); // BRP = 1 (TQ = 2/16MHz = 125ns), SJW = 1
-    MCP_write(REG_CNF2, 0xB1); // PRSEG = 2, PHSEG1 = 6, BTLMODE = 1, SAM = 0
-    MCP_write(REG_CNF3, 0x05); // PHSEG2 = 6, WAKFIL = 0
+    MCP_write(REG_CNF1, 0x03); // BRP = 1 (TQ = 2/16MHz = 125ns), SJW = 1
+    MCP_write(REG_CNF2, 0xB5); // PRSEG = 2, PHSEG1 = 6, BTLMODE = 1, SAM = 0
+    MCP_write(REG_CNF3, 0x01); // PHSEG2 = 6, WAKFIL = 0
+    
     
     MCP_write(REG_RXB0CTRL, 0x60);   // pas de filtrage
-    
-    MCP_write(REG_CANINTE, 0x01);
 
+    MCP_write(REG_CANINTE, 0x01);
+  
     MCP_bit_modify(REG_CANCTRL, 0xE0, 0x00);
 }
 

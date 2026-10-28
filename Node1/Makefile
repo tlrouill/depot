@@ -41,7 +41,7 @@ clean:
 
 .PHONY: erase
 erase:
-	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -e
+	avrdude -p $(TARGET_DEVICE) -c $(PROGRAMMER) -B 125kHz -e
 	
 .PHONY: debug
 debug:

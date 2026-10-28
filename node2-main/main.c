@@ -3,6 +3,8 @@
 #include "sam.h"
 #include "uart.h"
 #include "can.h"
+#include "pwm.h"
+
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -26,10 +28,10 @@ int main()
     
     CanInit init = {
         .phase2 = 1,   // Phase 2 = (1 + 1) = 2 Tq
-        .propag = 1,   // Propag  = (1 + 1) = 2 Tq
-        .phase1 = 2,   // Phase 1 = (2 + 1) = 3 Tq
+        .propag = 6,   // Propag  = (1 + 1) = 2 Tq
+        .phase1 = 5,   // Phase 1 = (2 + 1) = 3 Tq
         .sjw    = 0,   // SJW     = (0 + 1) = 1 Tq
-        .brp    = 20,  // Prescaler BRP
+        .brp    = 41,  // Prescaler BRP
         .smp    = 0    // Échantillonnage unique
     };
 
@@ -40,20 +42,15 @@ int main()
 
     CanMsg m;
 
-while (1) {
-    if (can_rx(&m)) {
-        // Un message vient d'être reçu !
-        printf("CanMsg(id:%d, length:%d, data:{", m.id, m.length);
-        if (m.length > 0) {
-            printf("%d", m.byte[0]);
+    while (1) {
+        if (can_rx(&m)) {
+            // Un message vient d'être reçu !
+            printf("CanMsg(id:0x%03X, length:%d, data:{", m.id, m.length);
+            if (m.length > 0) printf("0x%02X", m.byte[0]);
+            for (uint8_t i = 1; i < m.length; i++) printf(", 0x%02X", m.byte[i]);
+            printf("})\n\r");
         }
-        for (uint8_t i = 1; i < m.length; i++) {
-            printf(", %d", m.byte[i]);
-        }
-        printf("})\n\r");
-    }
-    
     // Suite du code (ex: contrôle des moteurs, etc.)
-}
+    }
     
 }

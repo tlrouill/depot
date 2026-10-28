@@ -95,21 +95,22 @@ int main(void) {
         _delay_ms(1000);
     }*/ 
     SPI_init();
+    _delay_ms(10);
     oled_init();
 
-    /*io_set_led(0, 1);
-    io_set_led(1, 1);
-    io_set_led(2, 1);
-    io_set_led(3, 1);
-    io_set_led(4, 1);
-    io_set_led(5, 1);
+    // io_set_led(0, 1);
+    // io_set_led(1, 1);
+    // io_set_led(2, 1);
+    // io_set_led(3, 1);
+    // io_set_led(4, 1);
+    // io_set_led(5, 1);
 
-    while (1)
-    {
-         Buttons btns = io_read_buttons();
-        printf("Bouton up : %d\n", btns.L2);
-        _delay_ms(500);
-    }*/
+    // while (1)
+    // {
+    //      Buttons btns = io_read_buttons();
+    //     printf("Bouton up : %d\n", btns.L2);
+    //     _delay_ms(500);
+    // }
     
    
     //oled_run_simple_menu();
@@ -118,39 +119,65 @@ int main(void) {
         io_update_led_from_buttons();
         _delay_ms(150);
     }*/
-        
+
+    //miso test
+    // while (1) {
+    //     io_read_buttons();
+    //     _delay_ms(100);
+    // }
+
     CAN_init();
+
+    
     init_interruptions();
 
 
     //test day 5 
     
     Can_message msg_tx = { .id = 0x041, .length = 2, .data = {0xAA, 0x55,} };
-    /*Can_message msg_rx = {0};
+    // Can_message msg_rx = {0};
 
-    // Debug : mode attendu 0x40 (loopback)
-    printf("CANSTAT = %02x\n", MCP_read(REG_CANSTAT));
+    // // Debug : mode attendu 0x40 (loopback)
+    // printf("CANSTAT = %02x\n", MCP_read(REG_CANSTAT));
 
+    // CAN_send_message(msg_tx);
+    // _delay_ms(10);
+
+    // printf("CANINTF = %02x  TXB0CTRL = %02x\n",
+    //        MCP_read(REG_CANINTF), MCP_read(REG_TXB0CTRL));
+
+    // if (MCP_read(REG_CANINTF) & 0x01) {        // RX0IF
+    //     CAN_receive_message(&msg_rx);
+    //     printf("id=%x len=%d d0=%x d1=%x\n",
+    //            msg_rx.id, msg_rx.length, msg_rx.data[0], msg_rx.data[1]);
+    // } else {
+    //     printf("rien recu\n");
+    // }
+    
+
+    
+    
     CAN_send_message(msg_tx);
-    _delay_ms(10);
-
-    printf("CANINTF = %02x  TXB0CTRL = %02x\n",
-           MCP_read(REG_CANINTF), MCP_read(REG_TXB0CTRL));
-
-    if (MCP_read(REG_CANINTF) & 0x01) {        // RX0IF
-        CAN_receive_message(&msg_rx);
-        printf("id=%x len=%d d0=%x d1=%x\n",
-               msg_rx.id, msg_rx.length, msg_rx.data[0], msg_rx.data[1]);
-    } else {
-        printf("rien recu\n");
-    }*/
+    _delay_ms(500);
 
 
+    // Can_message msg_pos_joystick = {
+    //     .id = 0x041, 
+    //     .length = 2
+    // };
 
-    while(1){
-        CAN_send_message(msg_tx);
-        _delay_ms(500);
-    }
+    // while(1){
+    //     Joystick joysitck = io_read_joystick();
+    //     _delay_ms(20);
+    //     msg_pos_joystick.data[0] = joysitck.x ; 
+    //     msg_pos_joystick.data[1] = joysitck.y ;
+
+    //     CAN_send_message(msg_pos_joystick);
+
+    //     _delay_ms(500);
+    // }
+
+    printf("programme finit");
 
     return 0;
 }
