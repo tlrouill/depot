@@ -3,6 +3,15 @@
 
 #include <stdlib.h>
 #include <avr/io.h>
+#include "adc_driver.h"   // type direction et joystick_position()
+
+// Valeurs brutes extrêmes du joystick de la carte I/O.
+// À mesurer : afficher io_read_joystick().x / .y en poussant à fond
+// dans chaque direction, puis remplacer ces valeurs.
+#define JOY_X_MIN   51     // à fond à gauche
+#define JOY_X_MAX   203   // à fond à droite
+#define JOY_Y_MIN   54     // à fond en bas
+#define JOY_Y_MAX   204   // à fond en haut
 
 
 typedef struct __attribute__((packed)) {
@@ -61,9 +70,22 @@ typedef struct {
 } Joystick;
 
 
+// Position du joystick convertie (comme pour l'ADC)
+typedef struct {
+    int x;          // -100 (gauche) .. 100 (droite)
+    int y;          // -100 (bas)    .. 100 (haut)
+    direction dir;  // NEUTRAL, LEFT, RIGHT, UP, DOWN
+    uint8_t btn;    // bouton du joystick
+} JoystickPos;
+
+
 Buttons io_read_buttons(void);
 
-Joystick io_read_joystick(void) ; 
+Joystick io_read_joystick(void) ;
+
+void io_joystick_calibrate(void);
+
+JoystickPos io_read_joystick_pos(void);
 
 TouchPad io_read_touchpad(void); 
 

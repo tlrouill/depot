@@ -4,6 +4,7 @@
 #include "uart.h"
 #include "can.h"
 #include "pwm.h"
+#include "joystick.h"
 
 
 /*
@@ -42,15 +43,24 @@ int main()
 
     CanMsg m;
 
+
+    JoystickData js;
+
     while (1) {
-        if (can_rx(&m)) {
-            // Un message vient d'être reçu !
-            printf("CanMsg(id:0x%03X, length:%d, data:{", m.id, m.length);
-            if (m.length > 0) printf("0x%02X", m.byte[0]);
-            for (uint8_t i = 1; i < m.length; i++) printf(", 0x%02X", m.byte[i]);
-            printf("})\n\r");
+        if (joystick_receive(&js)) {
+            printf("x = %d, y = %d, dir = %d, btn = %d\n\r", js.x, js.y, js.dir, js.btn);
         }
-    // Suite du code (ex: contrôle des moteurs, etc.)
     }
+
+    // while (1) {
+    //     if (can_rx(&m)) {
+    //         // Un message vient d'être reçu !
+    //         printf("CanMsg(id:0x%03X, length:%d, data:{", m.id, m.length);
+    //         if (m.length > 0) printf("%d", m.byte[0]);
+    //         for (uint8_t i = 1; i < m.length; i++) printf(", %d", m.byte[i]);
+    //         printf("})\n\r");
+    //     }
+    // // Suite du code (ex: contrôle des moteurs, etc.)
+    // }
     
 }

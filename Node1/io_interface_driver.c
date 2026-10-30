@@ -49,6 +49,51 @@ Joystick io_read_joystick(void) {
     return joystick_state;
 }
 
+// Centre mesuré au repos par io_joystick_calibrate() (valeurs brutes 0..255)
+static uint8_t center_x = 128;
+static uint8_t center_y = 128;
+
+// À appeler une fois au démarrage, joystick relâché
+void io_joystick_calibrate(void) {
+    uint16_t sum_x = 0, sum_y = 0;
+    for (uint8_t i = 0; i < 8; i++) {
+        Joystick j = io_read_joystick();
+        sum_x += j.x;
+        sum_y += j.y;
+        _delay_ms(5);
+    }
+    center_x = sum_x / 8;
+    center_y = sum_y / 8;
+}
+
+// Convertit une valeur brute en -100..100 :
+//  - au-dessus du centre : échelle entre center et max
+//  - en dessous du centre : échelle entre min et center
+// puis limite à ±100
+static int io_joystick_convert(uint8_t raw, uint8_t center, uint8_t min, uint8_t max) {
+    int pos;
+    if (raw >= center) {
+        if (max <= center) return 0;
+        pos = (int)(raw - center) * 100 / (max - center);
+    } else {
+        if (center <= min) return 0;
+        pos = -((int)(center - raw) * 100 / (center - min));
+    }
+    if (pos > 100)  pos = 100;
+    if (pos < -100) pos = -100;
+    return pos;
+}
+
+JoystickPos io_read_joystick_pos(void) {
+    Joystick raw = io_read_joystick();
+    JoystickPos p;
+    p.x   = io_joystick_convert(raw.x, center_x, JOY_X_MIN, JOY_X_MAX);
+    p.y   = io_joystick_convert(raw.y, center_y, JOY_Y_MIN, JOY_Y_MAX);
+    p.dir = joystick_position(p.x, p.y);
+    p.btn = raw.btn;
+    return p;
+}
+
 TouchPad io_read_touchpad(void) {
     TouchPad pad_state = {0}; 
 

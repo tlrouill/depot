@@ -98,6 +98,7 @@ int main(void) {
     _delay_ms(10);
     oled_init();
 
+    io_joystick_calibrate();
     // io_set_led(0, 1);
     // io_set_led(1, 1);
     // io_set_led(2, 1);
@@ -135,7 +136,7 @@ int main(void) {
     //test day 5 
     
     Can_message msg_tx = { .id = 0x041, .length = 2, .data = {0xAA, 0x55,} };
-    // Can_message msg_rx = {0};
+     Can_message msg_rx = {0};
 
     // // Debug : mode attendu 0x40 (loopback)
     // printf("CANSTAT = %02x\n", MCP_read(REG_CANSTAT));
@@ -154,30 +155,36 @@ int main(void) {
     //     printf("rien recu\n");
     // }
     
-
+    printf("tec = %02x, eflg = %02x\n", MCP_read(0x1C), MCP_read(0x2D)); 
     
-    
+   
     CAN_send_message(msg_tx);
+ 
     _delay_ms(500);
 
 
-    // Can_message msg_pos_joystick = {
-    //     .id = 0x041, 
-    //     .length = 2
-    // };
+    Can_message msg_pos_joystick = {
+        .id = 0x041, 
+        .length = 2
+    };
 
-    // while(1){
-    //     Joystick joysitck = io_read_joystick();
-    //     _delay_ms(20);
-    //     msg_pos_joystick.data[0] = joysitck.x ; 
-    //     msg_pos_joystick.data[1] = joysitck.y ;
+    while (1) {
+        JoystickPos js = io_read_joystick_pos();
 
-    //     CAN_send_message(msg_pos_joystick);
+        msg_pos_joystick.data[0] = (uint8_t)(int8_t)js.x;   // -100..100
+        msg_pos_joystick.data[1] = (uint8_t)(int8_t)js.y;   // -100..100
+        msg_pos_joystick.data[2] = js.dir;                  // NEUTRAL, LEFT, RIGHT, UP, DOWN
+        msg_pos_joystick.data[3] = js.btn;                  // bouton
+        msg_pos_joystick.length  = 4;
 
-    //     _delay_ms(500);
-    // }
+        printf("Joystick : x = %d, y = %d, dir = %d\r\n", js.x, js.y, js.dir);
 
-    printf("programme finit");
+        CAN_send_message(msg_pos_joystick);
+
+        _delay_ms(500);
+    }
+
+    //printf("programme finit");
 
     return 0;
 }

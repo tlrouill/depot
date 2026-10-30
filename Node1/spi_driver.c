@@ -12,7 +12,7 @@ void SPI_init(void){
     PORTB |= (1 << SPI_SLAVE_IO) | (1 << SPI_SLAVE_OLED) | (1 << SPI_SLAVE_CAN_CONTROLLER);
     // SPE=1 (Enable), MSTR=1 (Master), SPR1:0=00 (F_CPU/4)
     // CPOL=0, CPHA=0 (Mode 0)
-    SPCR = (1 << SPE) | (1 << MSTR);
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1);
     // SPSR: Ensure no double speed
     SPSR &= ~(1 << SPI2X);
 }
