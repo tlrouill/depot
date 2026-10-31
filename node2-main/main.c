@@ -5,6 +5,9 @@
 #include "can.h"
 #include "pwm.h"
 #include "joystick.h"
+#include "joystick.h"
+#include "servo.h"
+#include "tc.h"
 
 
 /*
@@ -17,6 +20,15 @@
  * apt or your favorite package manager.
  */
 //#include "../path_to/uart.h"
+
+// Incrémenté toutes les 10 ms par l'interruption du TC0
+static volatile uint32_t ticks = 0;
+ 
+static void on_tick(void)
+{
+    ticks++;            // plus tard : appeler ici le régulateur
+}
+
 
 int main()
 {
@@ -44,13 +56,34 @@ int main()
     CanMsg m;
 
 
-    JoystickData js;
-
+    JoystickData js = {0};
+ 
+    servo_init();                       // PWM 20 ms, servo au centre (1,5 ms)
+    tc_periodic_init(10000, on_tick);   // interruption toutes les 10 ms
+ 
+    uint32_t last_print = 0;
+ 
     while (1) {
         if (joystick_receive(&js)) {
-            printf("x = %d, y = %d, dir = %d, btn = %d\n\r", js.x, js.y, js.dir, js.btn);
+            servo_set_position(js.x);   // -100..100 -> 0,9..2,1 ms
+        }
+ 
+        // 100 ticks de 10 ms = 1 s : vérifie que le timer tourne
+        if (ticks - last_print >= 100) {
+            last_print = ticks;
+            printf("t = %lu s, x = %d, pulse = %lu us\n\r",
+                   (unsigned long)(ticks / 100), js.x,
+                   (unsigned long)servo_get_pulse_us());
         }
     }
+
+
+    //day 6 test 
+    // while (1) {
+    //     if (joystick_receive(&js)) {
+    //         printf("x = %d, y = %d, dir = %d, btn = %d\n\r", js.x, js.y, js.dir, js.btn);
+    //     }
+    // }
 
     // while (1) {
     //     if (can_rx(&m)) {

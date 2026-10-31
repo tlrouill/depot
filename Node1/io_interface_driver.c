@@ -55,6 +55,7 @@ static uint8_t center_y = 128;
 
 // À appeler une fois au démarrage, joystick relâché
 void io_joystick_calibrate(void) {
+    _delay_ms(50);
     uint16_t sum_x = 0, sum_y = 0;
     for (uint8_t i = 0; i < 8; i++) {
         Joystick j = io_read_joystick();

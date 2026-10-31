@@ -11,6 +11,10 @@ SOURCE_FILES = \
 	uart.c \
 	can.c \
 	joystick.c \
+	pwm.c \
+	servo.c \
+	tc.c \
+
 #	filenameN.c
 
 # Feel free to ignore anything below this line

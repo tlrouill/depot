@@ -171,17 +171,35 @@ int main(void) {
     while (1) {
         JoystickPos js = io_read_joystick_pos();
 
-        msg_pos_joystick.data[0] = (uint8_t)(int8_t)js.x;   // -100..100
-        msg_pos_joystick.data[1] = (uint8_t)(int8_t)js.y;   // -100..100
-        msg_pos_joystick.data[2] = js.dir;                  // NEUTRAL, LEFT, RIGHT, UP, DOWN
+        address_ADC[0]=1;
+        _delay_us(15);
+        uint8_t digital_signal_slider_x =read_ADC(0);
+        uint8_t digital_signal_slider_y =read_ADC(1);
+        uint8_t digital_signal_y =read_ADC(2);
+        uint8_t digital_signal_x = read_ADC(3);
+
+        int pos_x = master_conversion_x(digital_signal_x);
+        int pos_y = master_conversion_y(digital_signal_y);
+       
+        msg_pos_joystick.data[0] = pos_x;   // -100..100
+        msg_pos_joystick.data[1] = pos_y ;    // -100..100
+        msg_pos_joystick.data[2] = joystick_position(pos_x, pos_y);;                  // NEUTRAL, LEFT, RIGHT, UP, DOWN
         msg_pos_joystick.data[3] = js.btn;                  // bouton
         msg_pos_joystick.length  = 4;
 
-        printf("Joystick : x = %d, y = %d, dir = %d\r\n", js.x, js.y, js.dir);
+
+        //printf("Joystick : x = %d, y = %d, dir = %d\r\n", js.x, js.y, js.dir);
+
+
+        
+
+
+        printf("x: %i\n", pos_x);
+        printf("y: %i\n", pos_y);
 
         CAN_send_message(msg_pos_joystick);
 
-        _delay_ms(500);
+        _delay_ms(50);
     }
 
     //printf("programme finit");

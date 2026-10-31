@@ -8,10 +8,10 @@
 // Valeurs brutes extrêmes du joystick de la carte I/O.
 // À mesurer : afficher io_read_joystick().x / .y en poussant à fond
 // dans chaque direction, puis remplacer ces valeurs.
-#define JOY_X_MIN   51     // à fond à gauche
-#define JOY_X_MAX   203   // à fond à droite
-#define JOY_Y_MIN   54     // à fond en bas
-#define JOY_Y_MAX   204   // à fond en haut
+#define JOY_X_MIN   51    // à fond à gauche
+#define JOY_X_MAX   205   // à fond à droite
+#define JOY_Y_MIN   52    // à fond en bas
+#define JOY_Y_MAX   203  // à fond en haut
 
 
 typedef struct __attribute__((packed)) {
