@@ -27,7 +27,8 @@ static volatile uint32_t ticks = 0;
  
 static void on_tick(void)
 {
-    ticks++;            // plus tard : appeler ici le régulateur
+    ticks++;
+    goal_update();      // lecture IR + détection de but toutes les 10 ms
 }
 
 
@@ -62,6 +63,7 @@ int main()
     JoystickData js = {0};
  
     servo_init();                       // PWM 20 ms, servo au centre (1,5 ms)
+    goal_init();                        // ADC + filtre IR (AVANT le timer)
     tc_periodic_init(10000, on_tick);   // interruption toutes les 10 ms
  
     uint32_t last_print = 0;
