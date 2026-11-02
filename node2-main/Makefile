@@ -14,6 +14,9 @@ SOURCE_FILES = \
 	pwm.c \
 	servo.c \
 	tc.c \
+	adc.c \
+	goal.c \
+
 
 #	filenameN.c
 

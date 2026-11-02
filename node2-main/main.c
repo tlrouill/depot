@@ -8,6 +8,7 @@
 #include "joystick.h"
 #include "servo.h"
 #include "tc.h"
+#include "goal.h"
 
 
 /*
@@ -36,6 +37,8 @@ int main()
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
+    
+
     //Uncomment after including uart above
     uart_init(84000000, 9600);
     
@@ -63,22 +66,29 @@ int main()
  
     uint32_t last_print = 0;
  
-    while (1) {
+        while (1) {
         if (joystick_receive(&js)) {
             servo_set_position(js.x);   // -100..100 -> 0,9..2,1 ms
+        }
+ 
+        if (goal_new_goal()) {
+            printf("BUT ! total = %lu\n\r", (unsigned long)goal_get_count());
         }
  
         // 100 ticks de 10 ms = 1 s : vérifie que le timer tourne
         if (ticks - last_print >= 100) {
             last_print = ticks;
-            printf("t = %lu s, x = %d, pulse = %lu us\n\r",
+            printf("t = %lu s, x = %d, pulse = %lu us, ir = %u, coupe = %d, buts = %lu\n\r",
                    (unsigned long)(ticks / 100), js.x,
-                   (unsigned long)servo_get_pulse_us());
+                   (unsigned long)servo_get_pulse_us(),
+                   goal_get_filtered(), goal_is_blocked(),
+                   (unsigned long)goal_get_count());
         }
     }
 
 
-    //day 6 test 
+
+    // //day 6 test 
     // while (1) {
     //     if (joystick_receive(&js)) {
     //         printf("x = %d, y = %d, dir = %d, btn = %d\n\r", js.x, js.y, js.dir, js.btn);
