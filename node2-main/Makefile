@@ -18,6 +18,9 @@ SOURCE_FILES = \
 	goal.c \
 	encoder.c \
 	motor.c \
+	position.c \
+	controller.c \
+	solenoid.c \
 
 
 #	filenameN.c

@@ -4,10 +4,14 @@
 #define TC_CLK_HZ   (84000000u / 2u)    // TIMER_CLOCK1 = MCK/2
 
 static volatile tc_callback_t callback = 0;
+static volatile uint32_t elapsed_us = 0;   // temps écoulé depuis tc_periodic_init
+static uint32_t tick_us = 0;               // période d'une interruption
 
 void tc_periodic_init(uint32_t period_us, tc_callback_t cb)
 {
     callback = cb;
+    tick_us  = period_us;
+    elapsed_us = 0;
 
     // 1. Horloge du périphérique TC0 (ID 27 -> PMC_PCER0, bit 27)
     PMC->PMC_PCER0 = PMC_PCER0_PID27;
@@ -50,7 +54,19 @@ void TC0_Handler(void)
     // Lire TC_SR acquitte l'interruption ; sans ça on y reste bloqué.
     uint32_t status = TC0->TC_CHANNEL[0].TC_SR;
 
-    if ((status & TC_SR_CPCS) && callback) {
-        callback();
+    if (status & TC_SR_CPCS) {
+        elapsed_us += tick_us;
+        if (callback) callback();
     }
+}
+
+uint32_t tc_millis(void)
+{
+    return elapsed_us / 1000u;      // déborde après ~71 min : sans gravité ici
+}
+
+void tc_delay_ms(uint32_t ms)
+{
+    uint32_t start = tc_millis();
+    while (tc_millis() - start < ms) {}
 }

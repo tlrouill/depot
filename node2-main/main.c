@@ -5,12 +5,14 @@
 #include "can.h"
 #include "pwm.h"
 #include "joystick.h"
-#include "joystick.h"
 #include "servo.h"
 #include "tc.h"
 #include "goal.h"
 #include "encoder.h"
 #include "motor.h"
+#include "position.h"
+#include "controller.h"
+#include "solenoid.h"
 
 
 /*
@@ -26,12 +28,16 @@
 
 // Incrémenté toutes les 10 ms par l'interruption du TC0
 static volatile uint32_t ticks = 0;
+static uint8_t last_btn = 0;
  
 static void on_tick(void)
 {
     ticks++;
-    goal_update();      // lecture IR + détection de but toutes les 10 ms
+    goal_update();        // lecture IR + détection de but toutes les 10 ms
+    controller_update();  // régulateur PI de position, T = 10 ms
 }
+
+
 
 
 int main()
@@ -68,14 +74,28 @@ int main()
     goal_init();                        // ADC + filtre IR (AVANT le timer)
     tc_periodic_init(10000, on_tick);   // interruption toutes les 10 ms
     encoder_init();
-    motor_init();                       // moteur arrêté
- 
+    motor_init();                      // moteur arrêté
+    solenoid_init();
+
+
+    // Va aux deux butées : -100 / +100, centre = 0 (timer déjà lancé)
+    if (position_calibrate() == 0) {
+        controller_set_target(0);       // reste au centre au départ
+        controller_enable();            // à partir d'ici, seul le PI pilote le moteur
+    } else {
+        printf("Regulateur NON active (calibration ratee)\n\r");
+    }
+
     uint32_t last_print = 0;
  
-        while (1) {
+    while (1) {
         if (joystick_receive(&js)) {
-            motor_set(js.x);            // axe x -> moteur (sens + vitesse)
+            controller_set_target(js.x); // axe x -> POSITION voulue du chariot
             servo_set_position(js.y);   // axe y -> servo (0,9..2,1 ms)
+            if (js.btn && !last_btn) {      // front montant : on vient d'appuyer
+                solenoid_fire();
+            }
+            last_btn = js.btn;
         }
  
         if (goal_new_goal()) {
@@ -85,12 +105,14 @@ int main()
         // 100 ticks de 10 ms = 1 s : vérifie que le timer tourne
         if (ticks - last_print >= 100) {
             last_print = ticks;
-            printf("t = %lu s, x = %d, pulse = %lu us, ir = %u, coupe = %d, buts = %lu\n\r, enc = %ld\n\r", 
-                   (unsigned long)(ticks / 100), js.x,
+            printf("t = %lu s, consigne = %ld, pos = %ld, u = %ld, pulse = %lu us, ir = %u, buts = %lu\n\r",
+                   (unsigned long)(ticks / 100),
+                   (long)controller_get_target(),
+                   (long)position_read(),
+                   (long)controller_get_output(),
                    (unsigned long)servo_get_pulse_us(),
-                   goal_get_filtered(), goal_is_blocked(),
-                   (unsigned long)goal_get_count(),
-                    (long)encoder_read());
+                   goal_get_filtered(),
+                   (unsigned long)goal_get_count());
         }
     }
 

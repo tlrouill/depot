@@ -19,3 +19,10 @@ typedef void (*tc_callback_t)(void);
 void tc_periodic_init(uint32_t period_us, tc_callback_t cb);
 
 void tc_stop(void);
+
+// Temps écoulé depuis tc_periodic_init(), en ms
+// (précision = période du timer, ex. 10 ms).
+uint32_t tc_millis(void);
+
+// Attente active (le timer doit tourner).
+void tc_delay_ms(uint32_t ms);
