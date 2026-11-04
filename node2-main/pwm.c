@@ -1,7 +1,10 @@
 #include "sam.h"
 #include "pwm.h"
 
-static uint32_t period_us = 0;
+   static const uint32_t ch_pin[2] = {
+       PIO_PB12B_PWMH0,    // canal 0 -> PB12 (moteur)
+       PIO_PB13B_PWMH1,    // canal 1 -> PB13 (servo)
+   };
 
 void pwm_init(uint32_t period, uint32_t high_us)
 {

@@ -16,6 +16,8 @@ SOURCE_FILES = \
 	tc.c \
 	adc.c \
 	goal.c \
+	encoder.c \
+	motor.c \
 
 
 #	filenameN.c

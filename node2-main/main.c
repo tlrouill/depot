@@ -9,6 +9,8 @@
 #include "servo.h"
 #include "tc.h"
 #include "goal.h"
+#include "encoder.h"
+#include "motor.h"
 
 
 /*
@@ -65,12 +67,15 @@ int main()
     servo_init();                       // PWM 20 ms, servo au centre (1,5 ms)
     goal_init();                        // ADC + filtre IR (AVANT le timer)
     tc_periodic_init(10000, on_tick);   // interruption toutes les 10 ms
+    encoder_init();
+    motor_init();                       // moteur arrêté
  
     uint32_t last_print = 0;
  
         while (1) {
         if (joystick_receive(&js)) {
-            servo_set_position(js.x);   // -100..100 -> 0,9..2,1 ms
+            motor_set(js.x);            // axe x -> moteur (sens + vitesse)
+            servo_set_position(js.y);   // axe y -> servo (0,9..2,1 ms)
         }
  
         if (goal_new_goal()) {
@@ -80,11 +85,12 @@ int main()
         // 100 ticks de 10 ms = 1 s : vérifie que le timer tourne
         if (ticks - last_print >= 100) {
             last_print = ticks;
-            printf("t = %lu s, x = %d, pulse = %lu us, ir = %u, coupe = %d, buts = %lu\n\r",
+            printf("t = %lu s, x = %d, pulse = %lu us, ir = %u, coupe = %d, buts = %lu\n\r, enc = %ld\n\r", 
                    (unsigned long)(ticks / 100), js.x,
                    (unsigned long)servo_get_pulse_us(),
                    goal_get_filtered(), goal_is_blocked(),
-                   (unsigned long)goal_get_count());
+                   (unsigned long)goal_get_count(),
+                    (long)encoder_read());
         }
     }
 

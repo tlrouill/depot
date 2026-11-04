@@ -15,14 +15,14 @@ void servo_init(void)
     current_us = SERVO_CENTER_US;
     // Le temps haut initial est écrit avant l'activation du canal :
     // la toute première impulsion est déjà valide (1,5 ms).
-    pwm_init(SERVO_PERIOD_US, current_us);
+    pwm_init(PWM_CH_SERVO, SERVO_PERIOD_US, current_us); 
 }
 
 void servo_set_pulse_us(uint32_t us)
 {
     // Barrière de sécurité unique : tout passe par ici.
     current_us = clamp_pulse(us);
-    pwm_set_high_us(current_us);
+    pwm_set_high_us(PWM_CH_SERVO, current_us); 
 }
 
 void servo_set_position(int32_t u)
