@@ -24,7 +24,7 @@
 #define SOL_ACTIVE_LOW     1
 
 // ---- Durées (en ticks de 10 ms) ----
-#define SOL_PULSE_TICKS    3     // 30 ms d'impulsion : juste assez pour frapper
+#define SOL_PULSE_TICKS    10     // 30 ms d'impulsion : juste assez pour frapper
 #define SOL_COOLDOWN_TICKS 30    // 300 ms minimum entre deux tirs
 
 void    solenoid_init(void);     // sortie au repos (avant toute autre chose)

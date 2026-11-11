@@ -169,7 +169,8 @@ int main(void) {
     };
 
     while (1) {
-        JoystickPos js = io_read_joystick_pos();
+        Buttons btn = io_read_buttons();
+
 
         address_ADC[0]=1;
         _delay_us(15);
@@ -184,7 +185,7 @@ int main(void) {
         msg_pos_joystick.data[0] = pos_x;   // -100..100
         msg_pos_joystick.data[1] = pos_y ;    // -100..100
         msg_pos_joystick.data[2] = joystick_position(pos_x, pos_y);;                  // NEUTRAL, LEFT, RIGHT, UP, DOWN
-        msg_pos_joystick.data[3] = js.btn;                  // bouton
+        msg_pos_joystick.data[3] = btn.R6 ;                  // bouton
         msg_pos_joystick.length  = 4;
 
 

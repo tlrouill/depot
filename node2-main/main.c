@@ -26,6 +26,13 @@
  */
 //#include "../path_to/uart.h"
 
+#define JOG_SPEED      200.0f  // vitesse de la consigne joystick à fond (unités/s)
+#define JOY_DEADZONE   10      // |x| < 10 : joystick considéré au centre
+#define JOG_MAX_LEAD   30      // la consigne reste à moins de 30 du chariot
+
+static volatile int32_t joy_x = 0;
+static float jog_target = 0.0f;
+
 // Incrémenté toutes les 10 ms par l'interruption du TC0
 static volatile uint32_t ticks = 0;
 static uint8_t last_btn = 0;
@@ -34,7 +41,21 @@ static void on_tick(void)
 {
     ticks++;
     goal_update();        // lecture IR + détection de but toutes les 10 ms
+    int32_t x = joy_x;
+    if (x > -JOY_DEADZONE && x < JOY_DEADZONE) x = 0;      // zone morte
+
+    jog_target += JOG_SPEED * (float)x / 100.0f * 0.010f;  // incrément (T = 10 ms)
+
+    float pos = (float)position_read();                    // pas trop d'avance
+    if (jog_target > pos + JOG_MAX_LEAD) jog_target = pos + JOG_MAX_LEAD;
+    if (jog_target < pos - JOG_MAX_LEAD) jog_target = pos - JOG_MAX_LEAD;
+
+    if (jog_target >  100.0f) jog_target =  100.0f;        // rester dans le terrain
+    if (jog_target < -100.0f) jog_target = -100.0f;
+
+    controller_set_target((int32_t)jog_target);
     controller_update();  // régulateur PI de position, T = 10 ms
+    solenoid_update();
 }
 
 
@@ -90,7 +111,8 @@ int main()
  
     while (1) {
         if (joystick_receive(&js)) {
-            controller_set_target(js.x); // axe x -> POSITION voulue du chariot
+            joy_x = js.x;
+            //controller_set_target(js.x); // axe x -> POSITION voulue du chariot
             servo_set_position(js.y);   // axe y -> servo (0,9..2,1 ms)
             if (js.btn && !last_btn) {      // front montant : on vient d'appuyer
                 solenoid_fire();
