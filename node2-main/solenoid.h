@@ -18,10 +18,7 @@
 #define SOL_PIO_ID     ID_PIOC
 #define SOL_PIN        PIO_PC12
 
-// ---- Logique du transistor ----
-// 1 : PNP MPSA56, émetteur à +3,3 V (figure 28) -> broche à 0 = tir
-// 0 : NPN côté masse (bobine en 5 V)            -> broche à 1 = tir
-#define SOL_ACTIVE_LOW     1
+
 
 // ---- Durées (en ticks de 10 ms) ----
 #define SOL_PULSE_TICKS    10     // 30 ms d'impulsion : juste assez pour frapper

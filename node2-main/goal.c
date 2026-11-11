@@ -74,11 +74,7 @@ uint8_t goal_is_blocked(void)     { return blocked; }
 uint16_t goal_get_filtered(void)  { return filtered; }
 uint32_t goal_get_count(void)     { return count; }
 
-void goal_reset_count(void)
-{
-    count    = 0;
-    new_goal = 0;
-}
+
 
 uint8_t goal_new_goal(void)
 {

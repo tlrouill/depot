@@ -26,12 +26,14 @@
  */
 //#include "../path_to/uart.h"
 
-#define JOG_SPEED      200.0f  // vitesse de la consigne joystick à fond (unités/s)
-#define JOY_DEADZONE   10      // |x| < 10 : joystick considéré au centre
-#define JOG_MAX_LEAD   30      // la consigne reste à moins de 30 du chariot
+#define JOG_SPEED      150.0f  // vitesse de la consigne joystick à fond (unités/s)
+#define JOY_DEADZONE   5      // |x| < 10 : joystick considéré au centre
+#define JOG_MAX_LEAD   50      // la consigne reste à moins de 30 du chariot
+#define JOG_LIMIT      92.0f    // marge : la raquette ne touche jamais les butées
 
 static volatile int32_t joy_x = 0;
 static float jog_target = 0.0f;
+static volatile uint8_t jog_active = 0;   // 1 une fois le régulateur activé
 
 // Incrémenté toutes les 10 ms par l'interruption du TC0
 static volatile uint32_t ticks = 0;
@@ -41,19 +43,26 @@ static void on_tick(void)
 {
     ticks++;
     goal_update();        // lecture IR + détection de but toutes les 10 ms
-    int32_t x = joy_x;
-    if (x > -JOY_DEADZONE && x < JOY_DEADZONE) x = 0;      // zone morte
 
-    jog_target += JOG_SPEED * (float)x / 100.0f * 0.010f;  // incrément (T = 10 ms)
+   if (!jog_active) {
+        // Calibration en cours : la consigne suit le chariot, sans le piloter
+        jog_target = (float)position_read();
+    } else {
+        int32_t x = joy_x;
+        if (x > -JOY_DEADZONE && x < JOY_DEADZONE) x = 0;
 
-    float pos = (float)position_read();                    // pas trop d'avance
-    if (jog_target > pos + JOG_MAX_LEAD) jog_target = pos + JOG_MAX_LEAD;
-    if (jog_target < pos - JOG_MAX_LEAD) jog_target = pos - JOG_MAX_LEAD;
+        jog_target += JOG_SPEED * (float)x / 100.0f * 0.010f;
 
-    if (jog_target >  100.0f) jog_target =  100.0f;        // rester dans le terrain
-    if (jog_target < -100.0f) jog_target = -100.0f;
+        float pos = (float)position_read();
+        if (jog_target > pos + JOG_MAX_LEAD) jog_target = pos + JOG_MAX_LEAD;
+        if (jog_target < pos - JOG_MAX_LEAD) jog_target = pos - JOG_MAX_LEAD;
 
-    controller_set_target((int32_t)jog_target);
+        if (jog_target >  JOG_LIMIT) jog_target =  JOG_LIMIT;  
+        if (jog_target < -JOG_LIMIT) jog_target = -JOG_LIMIT;
+
+        controller_set_target((int32_t)jog_target);
+    }
+
     controller_update();  // régulateur PI de position, T = 10 ms
     solenoid_update();
 }
@@ -99,10 +108,10 @@ int main()
     solenoid_init();
 
 
-    // Va aux deux butées : -100 / +100, centre = 0 (timer déjà lancé)
+       // Va aux deux butées : -100 / +100, centre = 0 (timer déjà lancé)
     if (position_calibrate() == 0) {
-        controller_set_target(0);       // reste au centre au départ
         controller_enable();            // à partir d'ici, seul le PI pilote le moteur
+        jog_active = 1;                 // le joystick peut maintenant déplacer la consigne
     } else {
         printf("Regulateur NON active (calibration ratee)\n\r");
     }

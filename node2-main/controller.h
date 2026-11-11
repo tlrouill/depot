@@ -16,7 +16,7 @@
 
 // --- Réglages (à ajuster sur la vraie carte) ---------------------------
 #define CTRL_T_MS        10      // période d'appel (= période du timer)
-#define CTRL_KP          1.0f    // gain proportionnel
+#define CTRL_KP          2.0f    // gain proportionnel
 #define CTRL_KI          1.5f    // gain intégral (en 1/s)
 #define CTRL_DEADZONE    2       // |erreur| <= ça : on considère qu'on y est
 #define CTRL_U_MIN      18       // puissance minimale pour vaincre le frottement

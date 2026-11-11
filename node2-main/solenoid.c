@@ -6,20 +6,12 @@ static volatile uint16_t cooldown = 0;   // ticks restants avant un nouveau tir
 
 static inline void out_active(void)
 {
-#if SOL_ACTIVE_LOW
-    SOL_PIO->PIO_CODR = SOL_PIN;
-#else
-    SOL_PIO->PIO_SODR = SOL_PIN;
-#endif
+    SOL_PIO->PIO_CODR = SOL_PIN;   // 0 -> transistor PNP passant -> tir
 }
 
 static inline void out_idle(void)
 {
-#if SOL_ACTIVE_LOW
-    SOL_PIO->PIO_SODR = SOL_PIN;
-#else
-    SOL_PIO->PIO_CODR = SOL_PIN;
-#endif
+    SOL_PIO->PIO_SODR = SOL_PIN;   // 1 -> transistor bloqué -> repos
 }
 
 void solenoid_init(void)

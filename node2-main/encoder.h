@@ -13,8 +13,7 @@
  * quelle que soit la position réelle du chariot -> il faut calibrer.
  */
 
-// Mettre à 1 si la position diminue quand le chariot va dans le sens "positif"
-#define ENCODER_INVERT 0
+
 
 void    encoder_init(void);
 

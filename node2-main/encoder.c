@@ -21,10 +21,8 @@ void encoder_init(void)
     //    POSEN  : mesure de position (le compteur monte/descend selon le sens)
     //    EDGPHA : compte les fronts de A ET de B -> résolution x4
     TC2->TC_BMR = TC_BMR_QDEN | TC_BMR_POSEN | TC_BMR_EDGPHA
-#if ENCODER_INVERT
-                | TC_BMR_INVA
-#endif
-                ;
+                | TC_BMR_FILTER | TC_BMR_MAXFILT(63);
+    
 
     // 5. Démarrage + remise à zéro du compteur
     TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;

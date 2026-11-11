@@ -18,12 +18,6 @@
 // Limite de puissance (en %). Baisse-la pour les premiers essais.
 #define MOTOR_MAX_DUTY    100
 
-// Mettre à 1 si le moteur tourne dans le mauvais sens
-#define MOTOR_DIR_INVERT    0
-
-// Mettre à 1 si, avec une commande de 0, le moteur part à fond
-// (PWM inversé par la porte NOR)
-#define MOTOR_PWM_INVERT    0
 
 void motor_init(void);            // démarre moteur arrêté
 
@@ -32,4 +26,3 @@ void motor_set(int32_t u);
 
 void motor_stop(void);
 
-int32_t motor_get(void);          // dernière commande appliquée

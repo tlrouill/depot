@@ -36,7 +36,7 @@ void     goal_update(void);         // à appeler toutes les 10 ms
 uint8_t  goal_is_blocked(void);     // 1 si le faisceau est coupé en ce moment
 uint16_t goal_get_filtered(void);   // valeur filtrée (pour calibrer les seuils)
 uint32_t goal_get_count(void);      // nombre de buts depuis le début
-void     goal_reset_count(void);
+
 
 // Retourne 1 une seule fois par nouveau but (puis 0 jusqu'au suivant)
 uint8_t  goal_new_goal(void);
