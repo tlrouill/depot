@@ -21,3 +21,5 @@ int32_t position_read(void);
 float position_unit(void);
 
 uint8_t position_is_calibrated(void);
+
+int32_t position_span(void);   

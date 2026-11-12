@@ -65,7 +65,7 @@ static void go_to(int32_t target)
     motor_stop();
 }
 
-int position_calibrate(void)
+int position_calibrate(void) // AI written 
 {
     int32_t end_neg, end_pos;
     calibrated = 0;
@@ -101,7 +101,7 @@ int position_calibrate(void)
     printf("Calibration OK : -100 = %ld, +100 = %ld, centre = %ld ticks\n\r",
            (long)end_neg, (long)end_pos, (long)center);
 
-    go_to(0);                               // retour au centre
+        go_to(position_span() / 2);             // retour au centre (milieu de 0..n)
     return 0;
 }
 
@@ -112,7 +112,9 @@ int32_t position_read(void)
     // Position en ticks depuis le centre, positive vers la butée "+100"
     // (le signe de half_span corrige le sens de comptage de l'encodeur)
     int32_t p = encoder_read() - center;
-    return (half_span < 0) ? -p : p;
+    // Origine sur la butée "-100" : 0 = butée gauche, position_span() = butée droite
+    int32_t half = (half_span < 0) ? -half_span : half_span;
+    return ((half_span < 0) ? -p : p) + half;
 }
 
 float position_unit(void)
@@ -126,4 +128,10 @@ float position_unit(void)
 uint8_t position_is_calibrated(void)
 {
     return calibrated;
+}
+
+int32_t position_span(void)
+{
+    int32_t half = (half_span < 0) ? -half_span : half_span;
+    return 2 * half;
 }

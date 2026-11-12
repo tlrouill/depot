@@ -14,7 +14,7 @@ static inline void out_idle(void)
     SOL_PIO->PIO_SODR = SOL_PIN;   // 1 -> transistor bloqué -> repos
 }
 
-void solenoid_init(void)
+void solenoid_init(void) // AI written 
 {
     // 1. Horloge du port
     PMC->PMC_PCER0 = (1u << SOL_PIO_ID);

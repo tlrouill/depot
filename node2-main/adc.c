@@ -1,7 +1,7 @@
 #include "sam.h"
 #include "adc.h"
 
-void adc_init(void)
+void adc_init(void) //AI written 
 {
     // 1. Horloge du périphérique ADC (ID 37 -> PMC_PCER1, bit 5)
     PMC->PMC_PCER1 = (1u << (ID_ADC - 32));

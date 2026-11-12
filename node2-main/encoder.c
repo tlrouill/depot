@@ -1,7 +1,7 @@
 #include "sam.h"
 #include "encoder.h"
 
-void encoder_init(void)
+void encoder_init(void) // AI written 
 {
     // 1. Horloge de TC2 canal 0 (= "TC6", ID 33 -> PMC_PCER1 bit 1)
     PMC->PMC_PCER1 = PMC_PCER1_PID33;

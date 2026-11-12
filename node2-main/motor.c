@@ -16,7 +16,7 @@ static void set_dir(uint8_t forward)
     else         PIOC->PIO_CODR = MOTOR_DIR_PIN;   // DIR = 0
 }
 
-void motor_init(void)
+void motor_init(void) // AI written 
 {
     // 1. PC23 en sortie PIO classique (MOTOR DIR)
     PMC->PMC_PCER0 = PMC_PCER0_PID13;      // horloge PIOC
@@ -37,7 +37,7 @@ void motor_set(int32_t u)
     
     set_dir(u >= 0);
 
-    
+
     uint32_t duty = (uint32_t)(u >= 0 ? u : -u) * 100 / MOTOR_INPUT_MAX;
     if (duty > MOTOR_MAX_DUTY) duty = MOTOR_MAX_DUTY;
 

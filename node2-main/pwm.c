@@ -12,7 +12,7 @@ static const uint32_t ch_pin[PWM_NB_CH] = {
     PIO_PB13B_PWMH1,    // canal 1 -> PB13 (servo)
 };
 
-static void pwm_clock_init(void)
+static void pwm_clock_init(void)  // AI written 
 {
     // Horloge du périphérique PWM (ID 36 -> PMC_PCER1, bit 4)
     PMC->PMC_PCER1 = PMC_PCER1_PID36;
@@ -24,7 +24,7 @@ static void pwm_clock_init(void)
     clock_ready = 1;
 }
 
-void pwm_init(uint8_t ch, uint32_t period, uint32_t high_us)
+void pwm_init(uint8_t ch, uint32_t period, uint32_t high_us) // AI written 
 {
     if (ch >= PWM_NB_CH) return;
 

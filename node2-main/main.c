@@ -62,9 +62,11 @@ static void on_tick(void)
         if (jog_target > pos + JOG_MAX_LEAD * unit) jog_target = pos + JOG_MAX_LEAD * unit;
         if (jog_target < pos - JOG_MAX_LEAD * unit) jog_target = pos - JOG_MAX_LEAD * unit;
 
-        if (jog_target >  JOG_LIMIT * unit) jog_target =  JOG_LIMIT * unit;  
-        if (jog_target < -JOG_LIMIT * unit) jog_target = -JOG_LIMIT * unit;
-
+              
+        float lo = (100.0f - JOG_LIMIT) * unit;          
+        float hi = (float)position_span() - lo;
+        if (jog_target > hi) jog_target = hi;
+        if (jog_target < lo) jog_target = lo;
         controller_set_target((int32_t)jog_target);
     }
 

@@ -22,7 +22,7 @@ void controller_set_target(int32_t r)
     target = r;                             // en ticks (bornée par main.c)
 }
 
-void controller_update(void)
+void controller_update(void) // written with the help of AI 
 {
     if (!enabled) return;
 
@@ -51,7 +51,7 @@ void controller_update(void)
     // (anti-windup : pas d'intégrale qui explose quand le chariot est bloqué)
     if      (u >  CTRL_U_MAX) u =  CTRL_U_MAX;
     else if (u < -CTRL_U_MAX) u = -CTRL_U_MAX;
-    else    integral += CTRL_T * e;
+    else   integral += CTRL_T * e;
 
     // Puissance minimale : en dessous, le frottement empêche tout mouvement
     if (u > 0 && u <  CTRL_U_MIN) u =  CTRL_U_MIN;

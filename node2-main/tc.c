@@ -1,3 +1,5 @@
+// AI written
+
 #include "sam.h"
 #include "tc.h"
 
@@ -7,7 +9,7 @@ static volatile tc_callback_t callback = 0;
 static volatile uint32_t elapsed_us = 0;   // temps écoulé depuis tc_periodic_init
 static uint32_t tick_us = 0;               // période d'une interruption
 
-void tc_periodic_init(uint32_t period_us, tc_callback_t cb)
+void tc_periodic_init(uint32_t period_us, tc_callback_t cb)  
 {
     callback = cb;
     tick_us  = period_us;
