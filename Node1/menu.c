@@ -1,90 +1,60 @@
+#include "system_definitions.h"
 #include <util/delay.h>
+#include <stdio.h>
 
 #include "menu.h"
 #include "oled_driver.h"
 #include "io_interface_driver.h"
 
 
-void oled_run_simple_menu(void) {
-    uint8_t current_selection = 0;
-    uint8_t is_selected = 0;  // 0 = Curseur '>', 1 = Curseur 'x'
-    uint8_t needs_refresh = 1; // 1 = L'écran doit être redessiné
-    
-    Buttons btns;
+uint8_t oled_run_simple_menu(Buttons btns, uint8_t goals) {
+    static uint8_t current_selection = 0;
+    static uint8_t needs_refresh = 1;
+    static uint8_t shown_goals = 0;
+    static Buttons last = {0};
 
-    // Définition des 7 lignes selon votre demande
-    const char* menu_items[7] = {
-        "menu(0)",
-        "menu(1)",
-        "menu(2)",
-        "menu(3)",
-        "menu(4)",
-        "menu(5)",
-        "menu(6)"
-    };
+    uint8_t action = MENU_NONE;
 
-    while (1) {
-        // Ne redessine l'écran que si une action a eu lieu
-        if (needs_refresh == 1) {
-            oled_clear_display();
-            
-            for (uint8_t i = 0; i < 7; i++) {
-                oled_go_to_line(i);
-                oled_go_to_column(0);
-                
-                // Gestion de l'affichage du curseur
-                if (i == current_selection) {
-                    if (is_selected == 1) {
-                        oled_printf("x "); // Le bouton a été pressé
-                    } else {
-                        oled_printf("> "); // Navigation normale
-                    }
-                } else {
-                    oled_printf("  "); // Ligne non sélectionnée
-                }
-                
-                // Affichage du texte de la ligne
-                oled_printf(menu_items[i]);
-            }
-            needs_refresh = 0; // L'affichage est à jour
-        }
-
-        // Lecture des boutons de navigation
-        btns = io_read_buttons();
-
-        // Bouton Bas (Navigation Down)[cite: 121]
-        if (btns.ND == 1) { 
-            current_selection++;
-            if (current_selection > 6) {
-                current_selection = 0; // Retour tout en haut
-            }
-            is_selected = 0;   // Annuler l'état "sélectionné" (croix)
-            needs_refresh = 1; // Demander un rafraîchissement visuel
-            _delay_ms(500);    // Anti-rebond
-        }
-        
-        // Bouton Haut (Navigation Up)[cite: 121]
-        else if (btns.NU == 1) { 
-            if (current_selection == 0) {
-                current_selection = 6; // Retour tout en bas
-            } else {
-                current_selection--;
-            }
-            is_selected = 0;   // Annuler l'état "sélectionné" (croix)
-            needs_refresh = 1; // Demander un rafraîchissement visuel
-            _delay_ms(500);    // Anti-rebond
-        }
-        
-        // Bouton Central (Navigation Button)[cite: 121]
-        else if (btns.NB == 1) { 
-            is_selected = 1;   // Remplacer le '>' par 'x'
-            needs_refresh = 1; // Demander un rafraîchissement visuel
-            _delay_ms(500);    // Anti-rebond
-        }
-
-        // Petite pause pour relâcher le processeur et le bus SPI
-        _delay_ms(20); 
+    if (goals != shown_goals) {           // nouveau but : on redessine
+        shown_goals = goals;
+        needs_refresh = 1;
     }
+
+    // Une action par appui (front montant), sans _delay_ms()
+    if (btns.ND && !last.ND) {
+        current_selection = (current_selection + 1) % MENU_N_ITEMS;
+        needs_refresh = 1;
+    }
+    if (btns.NU && !last.NU) {
+        current_selection = (current_selection == 0) ? MENU_N_ITEMS - 1 : current_selection - 1;
+        needs_refresh = 1;
+    }
+    if (btns.NB && !last.NB && current_selection == 1) {
+        action = MENU_RESET;
+    }
+    last = btns;
+
+    if (needs_refresh) {
+        char ligne[17];
+
+        oled_clear_display();
+        oled_go_to_line(0);
+        oled_go_to_column(0);
+        oled_printf("PING-PONG");
+
+        oled_go_to_line(2);
+        oled_go_to_column(0);
+        sprintf(ligne, "%c Buts : %u", current_selection == 0 ? '>' : ' ', shown_goals);
+        oled_printf(ligne);
+
+        oled_go_to_line(3);
+        oled_go_to_column(0);
+        oled_printf(current_selection == 1 ? "> Reset partie" : "  Reset partie");
+
+        needs_refresh = 0;
+    }
+
+    return action;
 }
 
 void io_update_led_from_buttons(void) {

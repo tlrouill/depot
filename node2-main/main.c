@@ -30,6 +30,8 @@
 #define JOY_DEADZONE   5      // |x| < 10 : joystick considéré au centre
 #define JOG_MAX_LEAD   50      // la consigne reste à moins de 30 du chariot
 #define JOG_LIMIT      92.0f    // marge : la raquette ne touche jamais les butées
+#define NEW_GAME_CAN_ID  0x20   // nœud 1 -> nœud 2 : reset de la partie
+#define GOAL_CAN_ID      0x30   // nœud 2 -> nœud 1 : [0] buts, [1..2] secondes
 
 static volatile int32_t joy_x = 0;
 static float jog_target = 0.0f;
@@ -117,20 +119,42 @@ int main()
     }
 
     uint32_t last_print = 0;
+    uint8_t  buts_partie = 0;
+    uint32_t debut_partie_ms = 0;
  
     while (1) {
-        if (joystick_receive(&js)) {
-            joy_x = js.x;
-            //controller_set_target(js.x); // axe x -> POSITION voulue du chariot
-            servo_set_position(js.y);   // axe y -> servo (0,9..2,1 ms)
-            if (js.btn && !last_btn) {      // front montant : on vient d'appuyer
-                solenoid_fire();
+                // Message du nœud 1 : joystick (0x41) ou reset (0x20)
+        if (can_rx(&m)) {
+            if (joystick_decode(&m, &js)) {
+                joy_x = js.x;
+                servo_set_position(js.y);
+                if (js.btn && !last_btn) {
+                    solenoid_fire();
+                }
+                last_btn = js.btn;
+            } else if (m.id == NEW_GAME_CAN_ID) {
+                buts_partie = 0;
+                debut_partie_ms = tc_millis();
+                printf("Nouvelle partie\n\r");
             }
-            last_btn = js.btn;
         }
  
+        // But : on prévient le nœud 1
         if (goal_new_goal()) {
-            printf("BUT ! total = %lu\n\r", (unsigned long)goal_get_count());
+            buts_partie++;
+            uint16_t secondes = (tc_millis() - debut_partie_ms) / 1000;
+            printf("BUT ! %u dans la partie, apres %u s\n\r", buts_partie, secondes);
+
+            CanMsg but = {
+                .id = GOAL_CAN_ID,
+                .length = 3,
+                .byte = { buts_partie, secondes & 0xFF, secondes >> 8 },
+            };
+            // N'envoie que si la boîte d'émission est libre :
+            // sans nœud 1, can_tx() attendrait indéfiniment
+            if (CAN0->CAN_MB[0].CAN_MSR & CAN_MSR_MRDY) {
+                can_tx(but);
+            }
         }
  
         // 100 ticks de 10 ms = 1 s : vérifie que le timer tourne

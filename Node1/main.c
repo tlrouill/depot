@@ -18,6 +18,8 @@
 
 #define WAVE_PIN PB1
 #define ERROR_LED PB0
+#define NEW_GAME_CAN_ID 0x20   // nœud 1 -> nœud 2 : remet les buts à 0
+#define GOAL_CAN_ID     0x30   // nœud 2 -> nœud 1 : [0] = buts de la partie
 
 volatile uint8_t *address = (volatile uint8_t *)0x1800;
 
@@ -173,7 +175,7 @@ int main(void) {
 
 
         address_ADC[0]=1;
-        _delay_us(15);
+        _delay_us(40);
         uint8_t digital_signal_slider_x =read_ADC(0);
         uint8_t digital_signal_slider_y =read_ADC(1);
         uint8_t digital_signal_y =read_ADC(2);
@@ -199,6 +201,22 @@ int main(void) {
         printf("y: %i\n", pos_y);
 
         CAN_send_message(msg_pos_joystick);
+
+        // Message du nœud 2 : un but a été marqué
+        if (MCP_read(REG_CANINTF) & 0x01) {
+            Can_message rx;
+            CAN_receive_message(&rx);
+            if (rx.id == GOAL_CAN_ID && rx.length >= 1) {
+                goals = rx.data[0];
+            }
+        }
+
+        // Menu : affiche les buts, "Reset partie" remet tout à 0
+        if (oled_run_simple_menu(btn, goals) == MENU_RESET) {
+            Can_message reset = { .id = NEW_GAME_CAN_ID, .length = 0 };
+            CAN_send_message(reset);
+            goals = 0;
+        }
 
         _delay_ms(50);
     }
