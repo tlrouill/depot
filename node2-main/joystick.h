@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "can.h"      // pour le type CanMsg
 
 #define JOYSTICK_CAN_ID  0x041   // doit être égal à msg_pos_joystick.id du nœud 1
 
@@ -15,4 +16,4 @@ typedef struct {
 } JoystickData;
 
 // Retourne 1 si un message joystick a été reçu, 0 sinon
-uint8_t joystick_receive(JoystickData *js);
+uint8_t joystick_decode(CanMsg *m, JoystickData *js);

@@ -18,8 +18,8 @@
 #define CTRL_T_MS        10      // période d'appel (= période du timer)
 #define CTRL_KP          2.0f    // gain proportionnel
 #define CTRL_KI          1.5f    // gain intégral (en 1/s)
-#define CTRL_DEADZONE    2       // |erreur| <= ça : on considère qu'on y est
-#define CTRL_U_MIN      18       // puissance minimale pour vaincre le frottement
+#define CTRL_DEADZONE    -2       // |erreur| <= ça : on considère qu'on y est
+#define CTRL_U_MIN      0       // puissance minimale pour vaincre le frottement
 #define CTRL_U_MAX     80       // puissance maximale envoyée au moteur
 #define CTRL_I_MAX      50.0f    // limite de la part intégrale (anti-windup)
 // -----------------------------------------------------------------------

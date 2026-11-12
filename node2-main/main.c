@@ -26,7 +26,7 @@
  */
 //#include "../path_to/uart.h"
 
-#define JOG_SPEED      150.0f  // vitesse de la consigne joystick à fond (unités/s)
+#define JOG_SPEED      200.0f  // vitesse de la consigne joystick à fond (unités/s)
 #define JOY_DEADZONE   5      // |x| < 10 : joystick considéré au centre
 #define JOG_MAX_LEAD   50      // la consigne reste à moins de 30 du chariot
 #define JOG_LIMIT      92.0f    // marge : la raquette ne touche jamais les butées
@@ -66,6 +66,7 @@ static void on_tick(void)
     }
 
     controller_update();  // régulateur PI de position, T = 10 ms
+    //motor_set(joy_x * 60 / 100);   // TEST : joystick -> moteur directement
     solenoid_update();
 }
 
