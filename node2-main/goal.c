@@ -37,7 +37,6 @@ void goal_init(void)
 
 void goal_update(void)
 {
-    // 1. Moyenne glissante
     uint16_t v = adc_read();
     sum -= buffer[idx];
     buffer[idx] = v;
@@ -47,14 +46,14 @@ void goal_update(void)
 
     if (holdoff > 0) holdoff--;
 
-    // 2-5. Hystérésis + anti-rebond + détection de front
+    
     if (!blocked) {
         if (filtered < GOAL_THRESHOLD_LOW) {
             if (++below_cnt >= GOAL_DEBOUNCE) {
                 blocked   = 1;
                 below_cnt = 0;
-                if (holdoff == 0) { // hors temps mort : c'est un vrai but
-                    count++;        // front libre -> coupé : un but
+                if (holdoff == 0) { 
+                    count++;       
                     new_goal = 1;
                     holdoff  = GOAL_HOLDOFF;
                 }
@@ -63,7 +62,7 @@ void goal_update(void)
             below_cnt = 0;
         }
     } else {
-        // On ne réarme qu'une fois le faisceau franchement rétabli
+        
         if (filtered > GOAL_THRESHOLD_HIGH) {
             blocked = 0;
         }

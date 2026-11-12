@@ -76,9 +76,9 @@ void oled_write_char(char c) {
 void oled_clear_display(void) {
     for (uint8_t page = 0; page < 8; page++) {
         // 1. Envoyer manuellement les commandes pour se placer au début de la page
-        oled_write_command(0xB0 + page); // Définit la page de 0 à 7[cite: 32]
-        oled_write_command(0x00);        // Colonne 0 (4 bits de poids faible)[cite: 32]
-        oled_write_command(0x10);        // Colonne 0 (4 bits de poids fort)[cite: 32]
+        oled_write_command(0xB0 + page); // Définit la page de 0 à 7
+        oled_write_command(0x00);        // Colonne 0 (4 bits de poids faible)
+        oled_write_command(0x10);        // Colonne 0 (4 bits de poids fort)
         
         // 2. Écrire 128 fois 0x00 pour vider toute la largeur de cette page
         for (uint8_t col = 0; col < 128; col++) {

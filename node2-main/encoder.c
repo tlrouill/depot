@@ -30,8 +30,6 @@ void encoder_init(void)
 
 int32_t encoder_read(void)
 {
-    // Le compteur est sur 32 bits : en le lisant en signé,
-    // un pas en arrière depuis 0 donne -1 (et non 4294967295).
     return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }
 

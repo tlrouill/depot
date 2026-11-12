@@ -1,11 +1,11 @@
 #pragma once
 #include <stdint.h>
-#include "can.h"      // pour le type CanMsg
+#include "can.h"      
 
-#define JOYSTICK_CAN_ID  0x041   // doit être égal à msg_pos_joystick.id du nœud 1
+#define JOYSTICK_CAN_ID  0x041   
 
 typedef enum {
-    NEUTRAL, LEFT, RIGHT, UP, DOWN   // même ordre que dans adc_driver.h du nœud 1
+    NEUTRAL, LEFT, RIGHT, UP, DOWN   
 } direction;
 
 typedef struct {
@@ -15,5 +15,5 @@ typedef struct {
     uint8_t   btn;
 } JoystickData;
 
-// Retourne 1 si un message joystick a été reçu, 0 sinon
+
 uint8_t joystick_decode(CanMsg *m, JoystickData *js);

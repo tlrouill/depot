@@ -10,11 +10,7 @@ static uint8_t calibrated = 0;
 
 static int32_t abs32(int32_t v) { return v < 0 ? -v : v; }
 
-/*
- * Pousse le moteur avec la commande u jusqu'à ce qu'il soit bloqué.
- * Retourne 0 et la position encodeur de la butée dans *end_pos,
- * ou -1 si on n'a pas trouvé de butée avant le timeout.
- */
+
 static int drive_to_end(int32_t u, int32_t *end_pos)
 {
     uint32_t start = tc_millis();

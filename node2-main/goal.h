@@ -8,11 +8,8 @@
 #define GOAL_HOLDOFF          100   // x 10 ms = 1 s sans nouveau but après un but
 
 void     goal_init(void);
-void     goal_update(void);         // à appeler toutes les 10 ms
-uint8_t  goal_is_blocked(void);     // 1 si le faisceau est coupé en ce moment
-uint16_t goal_get_filtered(void);   // valeur filtrée (pour calibrer les seuils)
-uint32_t goal_get_count(void);      // nombre de buts depuis le début
-
-
-// Retourne 1 une seule fois par nouveau but (puis 0 jusqu'au suivant)
+void     goal_update(void);         
+uint8_t  goal_is_blocked(void);     
+uint16_t goal_get_filtered(void);   
+uint32_t goal_get_count(void);      
 uint8_t  goal_new_goal(void);

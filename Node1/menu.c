@@ -44,12 +44,12 @@ uint8_t oled_run_simple_menu(Buttons btns, uint8_t goals) {
 
         oled_go_to_line(2);
         oled_go_to_column(0);
-        sprintf(ligne, "%c Buts : %u", current_selection == 0 ? '>' : ' ', shown_goals);
+        sprintf(ligne, "%c Goals : %u", current_selection == 0 ? '>' : ' ', shown_goals);
         oled_printf(ligne);
 
         oled_go_to_line(3);
         oled_go_to_column(0);
-        oled_printf(current_selection == 1 ? "> Reset partie" : "  Reset partie");
+        oled_printf(current_selection == 1 ? "> Reset game" : "  Reset game");
 
         needs_refresh = 0;
     }
@@ -60,16 +60,15 @@ uint8_t oled_run_simple_menu(Buttons btns, uint8_t goals) {
 void io_update_led_from_buttons(void) {
     Buttons btns;
 
-    // 1. Lecture de l'état des boutons (n'oubliez pas le Chip Select)
+  
     btns = io_read_buttons();
 
-    // 2. Vérification globale
-    // Si l'octet 'right', 'left' ou 'nav' n'est pas nul, au moins un bit (bouton) est à 1[cite: 121]
+   
     if (btns.right != 0 || btns.left != 0 || btns.nav != 0) {
-        // Allume la LED numéro 0 de la carte IO[cite: 121]
+        // Allume la LED numéro 0 de la carte IO
         io_set_led(0, 1);
     } else {
-        // Éteint la LED numéro 0[cite: 121]
+        // Éteint la LED numéro 0
         io_set_led(0, 0);
     }
 }

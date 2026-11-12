@@ -1,3 +1,4 @@
+#include "system_definitions.h"
 #include <stdlib.h>
 #include <avr/io.h>
 #include <util/delay.h>
@@ -5,7 +6,7 @@
 
 #include "io_interface_driver.h"
 #include "spi_driver.h"
-#include "system_definitions.h"
+
 
 
 
@@ -54,7 +55,7 @@ Joystick io_read_joystick(void) {
 static uint8_t center_x = 128;
 static uint8_t center_y = 128;
 
-// À appeler une fois au démarrage, joystick relâché
+
 void io_joystick_calibrate(void) {
     _delay_ms(50);
     uint16_t sum_x = 0, sum_y = 0;
@@ -68,10 +69,7 @@ void io_joystick_calibrate(void) {
     center_y = sum_y / 8;
 }
 
-// Convertit une valeur brute en -100..100 :
-//  - au-dessus du centre : échelle entre center et max
-//  - en dessous du centre : échelle entre min et center
-// puis limite à ±100
+
 static int io_joystick_convert(uint8_t raw, uint8_t center, uint8_t min, uint8_t max) {
     int pos;
     if (raw >= center) {

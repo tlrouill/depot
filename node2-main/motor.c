@@ -30,14 +30,14 @@ void motor_init(void)
 
 void motor_set(int32_t u)
 {
-    // 1. Bornage de la commande
+   
     if (u >  MOTOR_INPUT_MAX) u =  MOTOR_INPUT_MAX;
     if (u < -MOTOR_INPUT_MAX) u = -MOTOR_INPUT_MAX;
 
-    // 2. Sens = signe de u
+    
     set_dir(u >= 0);
 
-    // 3. Puissance = |u| ramené en %, limité à MOTOR_MAX_DUTY
+    
     uint32_t duty = (uint32_t)(u >= 0 ? u : -u) * 100 / MOTOR_INPUT_MAX;
     if (duty > MOTOR_MAX_DUTY) duty = MOTOR_MAX_DUTY;
 

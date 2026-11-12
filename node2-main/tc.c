@@ -48,7 +48,7 @@ void tc_stop(void)
     NVIC_DisableIRQ(TC0_IRQn);
 }
 
-// Remplace le Dummy_Handler (déclaré "weak" dans exceptions.c)
+
 void TC0_Handler(void)
 {
     // Lire TC_SR acquitte l'interruption ; sans ça on y reste bloqué.
