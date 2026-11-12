@@ -1,6 +1,6 @@
 https://github.com/tlrouill/depot
 
-# TTK4155 – Ping-pong game (group XX, H26)
+# TTK4155 – Ping-pong game (group 40, H26)
 
 Distributed embedded ping-pong game built in TTK4155 at NTNU.
 
