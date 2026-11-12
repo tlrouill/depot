@@ -31,10 +31,6 @@ void servo_set_position(int32_t u)
     if (u >  SERVO_INPUT_MAX) u =  SERVO_INPUT_MAX;
     if (u < -SERVO_INPUT_MAX) u = -SERVO_INPUT_MAX;
 
-#if SERVO_INVERT
-    u = -u;
-#endif
-
     // Mise à l'échelle linéaire : ±100 -> ±600 µs autour de 1500 µs
     const int32_t half_range = (SERVO_MAX_US - SERVO_MIN_US) / 2;   // 600
     int32_t us = SERVO_CENTER_US + (u * half_range) / SERVO_INPUT_MAX;

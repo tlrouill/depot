@@ -1,21 +1,6 @@
 #pragma once
 #include <stdint.h>
 
-/*
- * Driver bas niveau du module PWM du SAM3X.
- *
- * Canaux gérés (sorties PWMH, périphérique B de PIOB) :
- *   canal 0 -> PB12 = PWMH0 = D20 -> MOTOR PWM du shield
- *   canal 1 -> PB13 = PWMH1 = D21 -> signal du servo
- *
- * Horloge commune : CLKA = MCK / 84 = 1 MHz  ->  1 tick = 1 µs
- * pour tous les canaux.
- *
- * Ce driver ne connaît ni le servo ni le moteur : il génère un signal
- * de période donnée avec un temps haut donné. Les limites de sécurité
- * sont dans servo.c et motor.c.
- */
-
 #define PWM_CH_MOTOR       0
 #define PWM_CH_SERVO       1
 

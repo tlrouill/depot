@@ -170,6 +170,8 @@ int main(void) {
         .length = 2
     };
 
+    uint8_t goals = 0;
+
     while (1) {
         Buttons btn = io_read_buttons();
 

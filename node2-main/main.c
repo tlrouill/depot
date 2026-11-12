@@ -27,7 +27,7 @@
 //#include "../path_to/uart.h"
 
 #define JOG_SPEED      200.0f  // vitesse de la consigne joystick à fond (unités/s)
-#define JOY_DEADZONE   5      // |x| < 10 : joystick considéré au centre
+#define JOY_DEADZONE   15      // |x| < 10 : joystick considéré au centre
 #define JOG_MAX_LEAD   50      // la consigne reste à moins de 30 du chariot
 #define JOG_LIMIT      92.0f    // marge : la raquette ne touche jamais les butées
 #define NEW_GAME_CAN_ID  0x20   // nœud 1 -> nœud 2 : reset de la partie
@@ -53,14 +53,17 @@ static void on_tick(void)
         int32_t x = joy_x;
         if (x > -JOY_DEADZONE && x < JOY_DEADZONE) x = 0;
 
-        jog_target += JOG_SPEED * (float)x / 100.0f * 0.010f;
+        // Position et consigne sont en ticks ; les réglages JOG_* restent en
+        // "unités" (-100..100) et sont convertis avec unit (~28 ticks/unité)
+        float unit = position_unit();
+        jog_target += JOG_SPEED * unit * (float)x / 100.0f * 0.010f;
 
         float pos = (float)position_read();
-        if (jog_target > pos + JOG_MAX_LEAD) jog_target = pos + JOG_MAX_LEAD;
-        if (jog_target < pos - JOG_MAX_LEAD) jog_target = pos - JOG_MAX_LEAD;
+        if (jog_target > pos + JOG_MAX_LEAD * unit) jog_target = pos + JOG_MAX_LEAD * unit;
+        if (jog_target < pos - JOG_MAX_LEAD * unit) jog_target = pos - JOG_MAX_LEAD * unit;
 
-        if (jog_target >  JOG_LIMIT) jog_target =  JOG_LIMIT;  
-        if (jog_target < -JOG_LIMIT) jog_target = -JOG_LIMIT;
+        if (jog_target >  JOG_LIMIT * unit) jog_target =  JOG_LIMIT * unit;  
+        if (jog_target < -JOG_LIMIT * unit) jog_target = -JOG_LIMIT * unit;
 
         controller_set_target((int32_t)jog_target);
     }
@@ -93,14 +96,9 @@ int main()
         .smp    = 0    // Échantillonnage unique
     };
 
-    // Appel à la fonction
     can_init(init, 0);
 
-    printf("Hello World\n\r");
-
     CanMsg m;
-
-
     JoystickData js = {0};
  
     servo_init();                       // PWM 20 ms, servo au centre (1,5 ms)
@@ -121,7 +119,6 @@ int main()
 
     uint32_t last_print = 0;
     uint8_t  buts_partie = 0;
-    uint32_t debut_partie_ms = 0;
  
     while (1) {
                 // Message du nœud 1 : joystick (0x41) ou reset (0x20)
@@ -135,21 +132,16 @@ int main()
                 last_btn = js.btn;
             } else if (m.id == NEW_GAME_CAN_ID) {
                 buts_partie = 0;
-                debut_partie_ms = tc_millis();
-                printf("Nouvelle partie\n\r");
             }
         }
  
         // But : on prévient le nœud 1
         if (goal_new_goal()) {
             buts_partie++;
-            uint16_t secondes = (tc_millis() - debut_partie_ms) / 1000;
-            printf("BUT ! %u dans la partie, apres %u s\n\r", buts_partie, secondes);
-
             CanMsg but = {
                 .id = GOAL_CAN_ID,
                 .length = 3,
-                .byte = { buts_partie, secondes & 0xFF, secondes >> 8 },
+                .byte = {buts_partie, },
             };
             // N'envoie que si la boîte d'émission est libre :
             // sans nœud 1, can_tx() attendrait indéfiniment

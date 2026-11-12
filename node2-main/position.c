@@ -53,10 +53,11 @@ static void go_to(int32_t target)
     uint32_t start = tc_millis();
 
     while (tc_millis() - start < 3000) {
-        int32_t err = target - position_read();
-        if (abs32(err) <= 3) break;         // assez proche
+        // Erreur convertie en unités (-100..100) : position_read() est en ticks
+        float err = (float)(target - position_read()) / position_unit();
+        if (err > -3.0f && err < 3.0f) break;   // assez proche
 
-        int32_t u = err * 2;                // gain P
+        int32_t u = (int32_t)(err * 2.0f);      // gain P
         if (u >  CAL_SPEED) u =  CAL_SPEED;
         if (u < -CAL_SPEED) u = -CAL_SPEED;
         if (u > 0 && u <  20) u =  20;      // minimum pour vaincre le frottement
@@ -112,12 +113,18 @@ int32_t position_read(void)
 {
     if (!calibrated) return 0;
 
-    // Mise à l'échelle linéaire : centre -> 0, butées -> ±100
-    int64_t p = (int64_t)(encoder_read() - center) * 100 / half_span;
+    // Position en ticks depuis le centre, positive vers la butée "+100"
+    // (le signe de half_span corrige le sens de comptage de l'encodeur)
+    int32_t p = encoder_read() - center;
+    return (half_span < 0) ? -p : p;
+}
 
-    if (p >  100) p =  100;
-    if (p < -100) p = -100;
-    return (int32_t)p;
+float position_unit(void)
+{
+    // Nombre de ticks pour 1 "unité" de l'ancienne échelle -100..100
+    // (ex. demi-course de 2800 ticks -> 28 ticks par unité)
+    int32_t half = (half_span < 0) ? -half_span : half_span;
+    return calibrated ? (float)half / 100.0f : 1.0f;
 }
 
 uint8_t position_is_calibrated(void)

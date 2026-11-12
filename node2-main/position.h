@@ -29,7 +29,11 @@
 // Retourne 0 si OK, -1 en cas d'échec (moteur ou encodeur qui ne répond pas)
 int position_calibrate(void);
 
-// Position actuelle dans [-100, 100] (0 = centre). 0 si pas calibré.
+// Position actuelle en TICKS depuis le centre (0 = centre, > 0 vers la
+// butée "+100"). 0 si pas calibré. Les butées sont à environ ±100 * position_unit().
 int32_t position_read(void);
+
+// Nombre de ticks pour une "unité" de l'échelle -100..100 (~28)
+float position_unit(void);
 
 uint8_t position_is_calibrated(void);

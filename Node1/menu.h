@@ -11,7 +11,7 @@
 #define MENU_RESET    1
 
 
-void oled_run_simple_menu(void);
+uint8_t oled_run_simple_menu(Buttons btns, uint8_t goals);
 void io_update_led_from_buttons(void);
 
 #endif

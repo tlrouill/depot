@@ -18,8 +18,6 @@
 
 #define SERVO_INPUT_MAX     100     // entrée attendue : -100 .. +100
 
-// Mettre à 1 si le servo tourne dans le mauvais sens par rapport au joystick
-#define SERVO_INVERT          0
 
 void servo_init(void);                  // démarre au centre
 

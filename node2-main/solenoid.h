@@ -1,19 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-/*
- * Driver solénoïde (exercice 3.8.4, point 6).
- *
- * Broche de commande -> 1 kΩ -> transistor -> bobine du relais (5-4)
- * Relais : +12 V sur 3, solénoïde sur 1.
- *
- * L'impulsion est NON bloquante : solenoid_fire() active la sortie,
- * solenoid_update() (appelée toutes les 10 ms depuis le TC0) la relâche
- * après SOL_PULSE_TICKS. Le régulateur moteur continue donc de tourner
- * pendant le tir.
- */
 
-// ---- Broche utilisée : D51 = PC12 (change ici si besoin) ----
 #define SOL_PIO        PIOC
 #define SOL_PIO_ID     ID_PIOC
 #define SOL_PIN        PIO_PC12
